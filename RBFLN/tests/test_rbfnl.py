@@ -24,14 +24,5 @@ class TestRBFLN(TestCase):
     def test_update_variance(self):
         pass
 
-    def test_init_weights(self):
-        pass
-
-    def test_init_variance(self):
-        pass
-
     def test_init_center_vectors(self):
-        pass
-
-    def test_init_learning_rates(self):
         pass
