@@ -34,7 +34,7 @@ class RBFLN(object):
         :type x: vector of float
         :type t: float
         """
-        pass
+        return (t - self.evaluate(x)) ** 2
 
     def total_sq_error(self, xs, ts):
         """Sum of the partial sum squared errors.
@@ -45,7 +45,17 @@ class RBFLN(object):
         :type xs: list of vector of float
         :type ts: list of float
         """
-        pass
+        msg = 'Input and output vectors should have the same length'
+        assert len(xs) == len(ts), msg
+
+        error = 0
+        Q = len(xs)
+        for i in range(Q):
+            t = ts[i]
+            x = xs[i]
+            error += self._sum_sq_error(x, t)
+
+        return error
 
     def evaluate(self, x):
         """Evaluate the model in the given input vector.
