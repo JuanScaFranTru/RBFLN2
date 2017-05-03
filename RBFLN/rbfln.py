@@ -3,10 +3,10 @@ from random import uniform
 
 class RBFLN(object):
 
-    def __init__(self, xs, ts, m, n, niter=100, etas=None, variance=None):
+    def __init__(self, xs, ts, M, N, niter=100, etas=None, variance=None):
         """Create a Radial Basis Functional Link Network.
 
-        Create a RBFLN with n neurons in the input layer, m neurons in the
+        Create a RBFLN with N neurons in the input layer, M neurons in the
         hidden layer and 1 neuron in the output layer.
         The xs and ts parameters should have the same length.
         The lengths of all the elements of xs should be equal to n.
@@ -14,14 +14,14 @@ class RBFLN(object):
 
         :param xs: input feature vectors used for training.
         :param ts: associated output target vectors used for training.
-        :param m: Number of neurons in the hidden layer.
-        :param n: Number of neurons in the input layer.
+        :param M: Number of neurons in the hidden layer.
+        :param N: Number of neurons in the input layer.
         :param niter: Number of iterations.
         :param etas: Learning rates.
         :param variance: The initial variance of the RBF.
 
-        :type m: int
-        :type n: int
+        :type M: int
+        :type N: int
         :type niter: int
         :type etas: list of int
         :type variance: float
@@ -88,22 +88,22 @@ class RBFLN(object):
 
         Select all weights randomly between -0.5 and 0.5."""
         MIN, MAX = -0.5, 0.5
-        n = self.n
-        m = self.m
-        self.us = us = [0] * m
-        self.ws = ws = [0] * n
+        N = self.N
+        M = self.M
+        self.us = us = [0] * M
+        self.ws = ws = [0] * N
 
-        for i in range(m):
-            us[i] = uniform(MIN, MAX)
+        for m in range(M):
+            us[m] = uniform(MIN, MAX)
 
-        for j in range(n):
-            ws[j] = uniform(MIN, MAX)
+        for n in range(N):
+            ws[n] = uniform(MIN, MAX)
 
     def _init_variance(self):
         """Compute initial values for variances."""
-        n = self.n
-        m = self.m
-        return 0.5 * (1/m) ** (1/n)
+        N = self.N
+        M = self.M
+        return 0.5 * (1/M) ** (1/N)
 
     def _init_center_vectors(self):
         """Init center vectors.
