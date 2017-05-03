@@ -161,9 +161,10 @@ class RBFLN(object):
             - Zs
         """
         xs = self.xs
-        self.squared_norms = self._squared_norms(xs)
-        self.ys = self._ys(xs)
-        self.z = self._z(xs)
+
+        self.squared_norms = np.apply_along_axis(self._squared_norms, 1, xs)
+        self.ys = np.apply_along_axis(self._ys, 1, xs)
+        self.z = np.apply_along_axis(self._z, 1, xs)
 
     def predict(self, x):
         """Predict the output using the model in the given input vector.
