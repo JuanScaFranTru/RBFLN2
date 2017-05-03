@@ -40,8 +40,8 @@ class RBFLN(object):
         :type eta_center_vectors: float
         :type variance: float
         """
-        self.xs = xs
-        self.ts = ts
+        self.xs = np.array(xs)
+        self.ts = np.array(ts)
         self.M = M
         self.N = N
         self.niter = niter
@@ -50,7 +50,6 @@ class RBFLN(object):
         self.eta_variance = eta_variance
         self.eta_center_vectors = eta_center_vectors
         self.variance = variance
-        self.variances = []
 
         msg = 'The xs and ts parameters should have the same length'
         assert len(xs) == len(ts), msg
@@ -196,8 +195,8 @@ class RBFLN(object):
         MIN, MAX = -0.5, 0.5
         N = self.N
         M = self.M
-        self.us = us = [0] * M
-        self.ws = ws = [0] * N
+        self.us = us = np.array([0] * M)
+        self.ws = ws = np.array([0] * N)
 
         for m in range(M):
             us[m] = uniform(MIN, MAX)
@@ -212,7 +211,7 @@ class RBFLN(object):
             M = self.M
             self.variance = 0.5 * (1/M) ** (1/N)
 
-        self.variances = [self.variance] * M
+        self.variances = np.array([self.variance] * M)
 
     def _init_center_vectors(self):
         """Init center vectors.
