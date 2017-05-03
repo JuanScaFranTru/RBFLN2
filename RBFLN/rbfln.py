@@ -28,6 +28,8 @@ class RBFLN(object):
         :param eta_center_vectors: Learning rate of center vectors.
         :param variance: The initial variance of the RBF.
 
+        :type xs: list of vector of float
+        :type ts: list of float
         :type M: int
         :type N: int
         :type niter: int
