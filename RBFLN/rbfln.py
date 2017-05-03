@@ -1,4 +1,5 @@
 from random import uniform
+import numpy as np
 
 
 class RBFLN(object):
@@ -95,17 +96,64 @@ class RBFLN(object):
 
         return error
 
-    def _squared_norm(self, x):
-        """Calculate Squared Norm value for every hidden neuron."""
-        pass
+    def _squared_norms(self, x):
+        """Calculate Squared Norm value for every hidden neuron.
 
-    def _y(self, x):
-        """Calculate the RBF output of every hidden neuron."""
-        pass
+        :param x: input feature vector.
+        :type x: vector of float
+
+        :rtype: vector of float
+        """
+        M = self.M
+        vs = self.vs
+
+        return [np.norm(x - vs[m]) ** 2 for m in range(M)]
+
+    def _ys(self, x):
+        """Calculate the RBF output of every hidden neuron.
+
+        :param x: input feature vector.
+        :type x: vector of float
+
+        :return: Output of the hidden layer.
+        :rtype: vector of float
+        """
+        M = self.M
+        N = self.N
+        variances = self.variances
+
+        if x in self.x_to_q:
+            q = self.x_to_q[x]
+            squared_norms = self.squared_norms[q]
+        else:
+            squared_norms = self._squared_norms(x)
+
+        return np.exp(- squared_norms / (2 * variances))
 
     def _z(self, x):
-        """Calculate the output of the RBFLN model."""
-        pass
+        """Calculate the output of the RBFLN model.
+
+        :param x: input feature vector.
+        :type x: vector of float
+
+        :return: output of the model.
+        :rtype: float
+        """
+        M = self.M
+        N = self.N
+        us = self.us
+        ws = self.ws
+
+        if x in self.x_to_q:
+            q = self.x_to_q[x]
+            ys = self.ys[q]
+        else:
+            ys = self._ys(x)
+
+        linear_component = np.dot(x, ws)
+        nonlinear_component = np.dot(ys, us)
+
+        return (1 / (M + N)) * (linear_component + nonlinear_component)
 
     def _precalculate(self):
         """Precalculate:
@@ -124,7 +172,7 @@ class RBFLN(object):
         :return: output of the model.
         :rtype: float
         """
-        pass
+        return self._z(x)
 
     def _update_weights(self):
         """Update weights using gradient descent."""
