@@ -3,7 +3,12 @@ from random import uniform
 
 class RBFLN(object):
 
-    def __init__(self, xs, ts, M, N, niter=100, etas=None, variance=None):
+    def __init__(self, xs, ts, M, N, niter=100,
+                 eta_linear_weights=None,
+                 eta_non_linear_weights=None,
+                 eta_variance=None,
+                 eta_center_vectors=None,
+                 variance=None):
         """Create a Radial Basis Functional Link Network.
 
         Create a RBFLN with N neurons in the input layer, M neurons in the
@@ -17,13 +22,19 @@ class RBFLN(object):
         :param M: Number of neurons in the hidden layer.
         :param N: Number of neurons in the input layer.
         :param niter: Number of iterations.
-        :param etas: Learning rates.
+        :param eta_linear_weights: Learning rate of linear weights.
+        :param eta_non_linear_weights: Learning rate of non linear weights.
+        :param eta_variance: Learning rate of variance.
+        :param eta_center_vectors: Learning rate of center vectors.
         :param variance: The initial variance of the RBF.
 
         :type M: int
         :type N: int
         :type niter: int
-        :type etas: list of int
+        :type eta_linear_weights: float
+        :type eta_non_linear_weights: float
+        :type eta_variance: float
+        :type eta_center_vectors: float
         :type variance: float
         """
         pass
@@ -117,4 +128,14 @@ class RBFLN(object):
 
     def _init_learning_rates(self):
         """Init learning rates."""
-        pass
+        if self.eta_linear_weights is None:
+            self.eta_linear_weights = 2
+
+        if self.eta_non_linear_weights is None:
+            self.eta_non_linear_weights = 2
+
+        if self.eta_variance is None:
+            self.eta_variance = 0.1
+
+        if self.eta_center_vectors is None:
+            self.eta_center_vectors = 0.1
