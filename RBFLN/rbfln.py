@@ -49,13 +49,14 @@ class RBFLN(object):
         self.eta_variance = eta_variance
         self.eta_center_vectors = eta_center_vectors
         self.variance = variance
+        self.variances = []
 
         msg = 'The xs and ts parameters should have the same length'
         assert len(xs) == len(ts), msg
 
         # Initialize variables
         self._init_center_vectors()
-        self._init_variance()
+        self._init_variances()
         self._init_weights()
         self._init_learning_rates()
 
@@ -153,12 +154,14 @@ class RBFLN(object):
         for n in range(N):
             ws[n] = uniform(MIN, MAX)
 
-    def _init_variance(self):
+    def _init_variances(self):
         """Compute initial values for variances."""
         if self.variance is None:
             N = self.N
             M = self.M
             self.variance = 0.5 * (1/M) ** (1/N)
+
+        self.variances = [self.variance] * M
 
     def _init_center_vectors(self):
         """Init center vectors.
