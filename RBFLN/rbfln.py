@@ -75,7 +75,7 @@ class RBFLN(object):
         :type x: vector of float
         :type t: float
         """
-        return (t - self.evaluate(x)) ** 2
+        return (t - self.predict(x)) ** 2
 
     def total_sq_error(self, xs, ts):
         """Sum of the partial sum squared errors.
