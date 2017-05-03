@@ -37,7 +37,22 @@ class RBFLN(object):
         :type eta_center_vectors: float
         :type variance: float
         """
-        pass
+        self.xs = xs
+        self.ts = ts
+        self.eta_linear_weights = eta_linear_weights
+        self.eta_non_linear_weights = eta_non_linear_weights
+        self.eta_variance = eta_variance
+        self.eta_center_vectors = eta_center_vectors
+        self.variance = variance
+
+        # Initialize variables
+        self._init_center_vectors()
+        self._init_variance()
+        self._init_weights()
+        self._init_learning_rates()
+
+        # Train the model using the training data
+        pass  # TODO
 
     def _sum_sq_error(self, x, t):
         """Partial sum squared errors of the given training input feature
