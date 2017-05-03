@@ -221,7 +221,21 @@ class RBFLN(object):
         put v(q) = x(q) , q = 1,...,Q, and draw the remaining M - Q centers at
         random in the feature space.
         """
-        pass
+        M = self.M
+        N = self.N
+        xs = self.xs
+        self.vs = vs = np.array([0] * M)
+
+        Q = len(xs)
+
+        # Initialize vs by putting v(m) = x(m) for m = 1, ..., min(M, Q)
+        for m in range(min(M, Q)):
+            vs[m] = np.array(xs[m])
+
+        # Draw the ramaining feature M - Q (if M - Q is positive) centers at
+        # random in the feature space.
+        for m in range(M - Q):
+            vs[m] = np.random.rand(N)
 
     def _init_learning_rates(self):
         """Init learning rates."""
