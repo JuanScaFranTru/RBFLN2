@@ -1,3 +1,6 @@
+from random import uniform
+
+
 class RBFLN(object):
 
     def __init__(self, xs, ts, m, n, niter=100, etas=None, variance=None):
@@ -84,7 +87,17 @@ class RBFLN(object):
         """Init linear and non-linear weights.
 
         Select all weights randomly between -0.5 and 0.5."""
-        pass
+        MIN, MAX = -0.5, 0.5
+        n = self.n
+        m = self.m
+        self.us = us = [0] * m
+        self.ws = ws = [0] * n
+
+        for i in range(m):
+            us[i] = uniform(MIN, MAX)
+
+        for j in range(n):
+            ws[j] = uniform(MIN, MAX)
 
     def _init_variance(self):
         """Compute initial values for variances."""
