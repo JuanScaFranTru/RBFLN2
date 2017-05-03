@@ -41,11 +41,17 @@ class RBFLN(object):
         """
         self.xs = xs
         self.ts = ts
+        self.M = M
+        self.N = N
+        self.niter = niter
         self.eta_linear_weights = eta_linear_weights
         self.eta_non_linear_weights = eta_non_linear_weights
         self.eta_variance = eta_variance
         self.eta_center_vectors = eta_center_vectors
         self.variance = variance
+
+        msg = 'The xs and ts parameters should have the same length'
+        assert len(xs) == len(ts), msg
 
         # Initialize variables
         self._init_center_vectors()
