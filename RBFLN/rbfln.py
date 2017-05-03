@@ -112,9 +112,10 @@ class RBFLN(object):
 
     def _init_variance(self):
         """Compute initial values for variances."""
-        N = self.N
-        M = self.M
-        return 0.5 * (1/M) ** (1/N)
+        if self.variance is None:
+            N = self.N
+            M = self.M
+            self.variance = 0.5 * (1/M) ** (1/N)
 
     def _init_center_vectors(self):
         """Init center vectors.
