@@ -88,8 +88,28 @@ class RBFLN(object):
 
         return error
 
-    def evaluate(self, x):
-        """Evaluate the model in the given input vector.
+    def _squared_norm(self, x):
+        """Calculate Squared Norm value for every hidden neuron."""
+        pass
+
+    def _y(self, x):
+        """Calculate the RBF output of every hidden neuron."""
+        pass
+
+    def _z(self, x):
+        """Calculate the output of the RBFLN model."""
+        pass
+
+    def _precalculate(self):
+        """Precalculate:
+            - Norms
+            - Ys
+            - Zs
+        """
+        pass
+
+    def predict(self, x):
+        """Predict the output using the model in the given input vector.
 
         :param x: input feature vector.
         :type x: vector of float
