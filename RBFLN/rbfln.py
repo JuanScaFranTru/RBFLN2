@@ -108,7 +108,7 @@ class RBFLN(object):
         M = self.M
         vs = self.vs
 
-        return [np.norm(x - vs[m]) ** 2 for m in range(M)]
+        return [np.linalg.norm(x - vs[m]) ** 2 for m in range(M)]
 
     def _ys(self, x):
         """Calculate the RBF output of every hidden neuron.
