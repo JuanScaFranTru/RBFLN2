@@ -118,8 +118,6 @@ class RBFLN(object):
         :return: Output of the hidden layer.
         :rtype: vector of float
         """
-        M = self.M
-        N = self.N
         variances = self.variances
 
         if x in self.x_to_q:
