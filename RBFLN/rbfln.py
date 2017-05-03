@@ -179,7 +179,19 @@ class RBFLN(object):
 
     def _update_weights(self):
         """Update weights using gradient descent."""
-        pass
+        eta1 = self.eta_non_linear_weights
+        eta2 = self.eta_linear_weights
+        us = self.us
+        ws = self.ws
+        ts = self.ts
+        ys = self.ys
+        xs = self.xs
+        z = self.z
+
+        M = self.M
+        N = self.N
+        us = us + eta1/(M + N) * np.dot((ts - z), ys)
+        ws = ws + eta2/(M + N) * np.dot((ts - z), xs)
 
     def _update_center_vectors(self):
         """Update center vectors using gradient descent."""
