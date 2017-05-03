@@ -1,12 +1,61 @@
 class RBFLN(object):
 
-    def __init__(self):
+    def __init__(self, xs, ts, M, N, I=100, etas=None, variance=None):
+        """Create a Radial Basis Functional Link Network.
+
+        Create a RBFLN with N neurons in the input layer, M neurons in the
+        hidden layer and 1 neuron in the output layer.
+        The xs and ts parameters should have the same length.
+        The lengths of all the elements of xs should be equal to N.
+        The lengths of all the elements of ts should be equal to 1.
+
+        :param xs: input feature vectors used for training.
+        :param ts: associated output target vectors used for training.
+        :param M: Number of neurons in the hidden layer.
+        :param N: Number of neurons in the input layer.
+        :param I: Number of iterations.
+        :param etas: Learning rates.
+        :param variance: The initial variance of the RBF.
+
+        :type M: int
+        :type N: int
+        :type I: int
+        :type etas: list of int
+        :type variance: float
+        """
         pass
 
-    def _sum_sq_error(self, xs, ts):
+    def _sum_sq_error(self, x, t):
+        """Partial sum squared errors of the given training input feature
+        vectors and associated output target vectors.
+
+        :param x: input feature vector.
+        :param t: associated output target vector.
+        :type x: vector of float
+        :type t: float
+        """
         pass
 
     def total_sq_error(self, xs, ts):
+        """Sum of the partial sum squared errors.
+
+        :param xs: input feature vectors.
+        :param ts: associated output target vectors.
+
+        :type xs: list of vector of float
+        :type ts: list of float
+        """
+        pass
+
+    def evaluate(self, x):
+        """Evaluate the model in the given input vector.
+
+        :param x: input feature vector.
+        :type x: vector of float
+
+        :return: output of the model.
+        :rtype: float
+        """
         pass
 
     def _update_weights(self):
@@ -38,7 +87,8 @@ class RBFLN(object):
         Let Q be the number of input feature vectors.
         Initialize RBF center vectors by putting v(m) = x(m) if M <= Q, else
         put v(q) = x(q) , q = 1,...,Q, and draw the remaining M - Q centers at
-        random in the feature space."""
+        random in the feature space.
+        """
         pass
 
     def _init_learning_rates(self):
