@@ -55,6 +55,8 @@ class RBFLN(object):
         msg = 'The xs and ts parameters should have the same length'
         assert len(xs) == len(ts), msg
 
+        self.x_to_q = {xs[q]: q for q in range(len(xs))}
+
         # Initialize variables
         self._init_center_vectors()
         self._init_variances()
@@ -159,7 +161,10 @@ class RBFLN(object):
             - Ys
             - Zs
         """
-        pass
+        xs = self.xs
+        self.squared_norms = self._squared_norms(xs)
+        self.ys = self._ys(xs)
+        self.z = self._z(xs)
 
     def predict(self, x):
         """Predict the output using the model in the given input vector.
