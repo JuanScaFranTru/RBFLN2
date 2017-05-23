@@ -53,8 +53,6 @@ class RBFLN(object):
         msg = 'The xs and ts parameters should have the same length'
         assert len(xs) == len(ts), msg
 
-        self.x_to_q = {xs[q]: q for q in range(len(xs))}
-
         # Initialize variables
         self._init_center_vectors()
         self._init_variances()
@@ -89,19 +87,6 @@ class RBFLN(object):
 
         return sum([self._sum_sq_error(x, t) for x, t in zip(xs, ts)])
 
-    def _squared_norms(self, x):
-        """Calculate Squared Norm value for every hidden neuron.
-
-        :param x: input feature vector.
-        :type x: vector of float
-
-        :rtype: vector of float
-        """
-        M = self.M
-        vs = self.vs
-
-        return [np.linalg.norm(x - vs[m]) ** 2 for m in range(M)]
-
     def _ys(self, x):
         """Calculate the RBF output of every hidden neuron.
 
@@ -111,14 +96,9 @@ class RBFLN(object):
         :return: Output of the hidden layer.
         :rtype: vector of float
         """
+        vs = self.vs
         variances = self.variances
-
-        if x in self.x_to_q:
-            q = self.x_to_q[x]
-            squared_norms = self.squared_norms[q]
-        else:
-            squared_norms = self._squared_norms(x)
-
+        squared_norms = np.array([norm(x - v) ** 2 for v in vs])
         return np.exp(- squared_norms / (2 * variances))
 
     def _z(self, x):
@@ -135,28 +115,12 @@ class RBFLN(object):
         us = self.us
         ws = self.ws
 
-        if x in self.x_to_q:
-            q = self.x_to_q[x]
-            ys = self.ys[q]
-        else:
-            ys = self._ys(x)
+        ys = self._ys(x)
 
         linear_component = np.dot(x, ws)
         nonlinear_component = np.dot(ys, us)
 
         return (1 / (M + N)) * (linear_component + nonlinear_component)
-
-    def _precalculate(self):
-        """Precalculate:
-            - Norms
-            - Ys
-            - Zs
-        """
-        xs = self.xs
-
-        self.squared_norms = np.apply_along_axis(self._squared_norms, 1, xs)
-        self.ys = np.apply_along_axis(self._ys, 1, xs)
-        self.z = np.apply_along_axis(self._z, 1, xs)
 
     def predict(self, x):
         """Predict the output using the model in the given input vector.
