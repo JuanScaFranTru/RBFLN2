@@ -1,4 +1,3 @@
-from random import uniform
 import numpy as np
 
 
@@ -88,14 +87,7 @@ class RBFLN(object):
         msg = 'Input and output vectors should have the same length'
         assert len(xs) == len(ts), msg
 
-        error = 0
-        Q = len(xs)
-        for i in range(Q):
-            t = ts[i]
-            x = xs[i]
-            error += self._sum_sq_error(x, t)
-
-        return error
+        return sum([self._sum_sq_error(x, t) for x, t in zip(xs, ts)])
 
     def _squared_norms(self, x):
         """Calculate Squared Norm value for every hidden neuron.
@@ -206,25 +198,19 @@ class RBFLN(object):
 
         Select all weights randomly between -0.5 and 0.5."""
         MIN, MAX = -0.5, 0.5
-        N = self.N
-        M = self.M
-        self.us = us = np.array([0] * M)
-        self.ws = ws = np.array([0] * N)
-
-        for m in range(M):
-            us[m] = uniform(MIN, MAX)
-
-        for n in range(N):
-            ws[n] = uniform(MIN, MAX)
+        self.us = np.random.uniform(MIN, MAX, (self.M))
+        self.ws = np.random.uniform(MIN, MAX, (self.N))
 
     def _init_variances(self):
         """Compute initial values for variances."""
-        if self.variance is None:
-            N = self.N
-            M = self.M
-            self.variance = 0.5 * (1/M) ** (1/N)
+        variance = self.variance
+        N = self.N
+        M = self.M
 
-        self.variances = np.array([self.variance] * M)
+        if variance is None:
+            variance = 0.5 * (1/M) ** (1/N)
+
+        self.variances = np.array([variance] * M)
 
     def _init_center_vectors(self):
         """Init center vectors.
@@ -237,18 +223,11 @@ class RBFLN(object):
         M = self.M
         N = self.N
         xs = self.xs
-        self.vs = vs = np.array([0] * M)
-
         Q = len(xs)
 
-        # Initialize vs by putting v(m) = x(m) for m = 1, ..., min(M, Q)
-        for m in range(min(M, Q)):
-            vs[m] = np.array(xs[m])
-
-        # Draw the ramaining feature M - Q (if M - Q is positive) centers at
-        # random in the feature space.
-        for m in range(M - Q):
-            vs[m] = np.random.rand(N)
+        self.vs = vs = xs[:M]
+        if M > Q:
+            vs = np.concatenate((vs, np.random.uniform(0, 1, (M - Q, N))))
 
     def _init_learning_rates(self):
         """Init learning rates."""
