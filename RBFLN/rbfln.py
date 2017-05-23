@@ -39,7 +39,7 @@ class RBFLN(object):
         :type eta_center_vectors: float
         :type variance: float
         """
-        self.xs = np.array(xs)
+        self.xs = np.array([np.array(x) for x in xs])
         self.ts = np.array(ts)
         self.M = M
         self.N = N
