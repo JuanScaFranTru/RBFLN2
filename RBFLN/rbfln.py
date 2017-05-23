@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 
 
 class RBFLN(object):
@@ -133,29 +134,48 @@ class RBFLN(object):
         """
         return self._z(x)
 
-    def _update_weights(self):
-        """Update weights using gradient descent."""
+    def _update_variables(self):
+        """Update weights, center vectors and variances"""
         eta1 = self.eta_non_linear_weights
         eta2 = self.eta_linear_weights
+        eta3 = self.eta_center_vectors
+        eta4 = self.eta_variance
+        vs = self.vs
         us = self.us
         ws = self.ws
         ts = self.ts
-        ys = self.ys
         xs = self.xs
-        z = self.z
-
+        ys = np.apply_along_axis(self._ys, 1, xs)
+        zs = np.apply_along_axis(self._z, 1, xs)
+        variances = self.variances
         M = self.M
         N = self.N
-        us = us + eta1/(M + N) * np.dot((ts - z), ys)
-        ws = ws + eta2/(M + N) * np.dot((ts - z), xs)
+        Q = len(xs)
 
-    def _update_center_vectors(self):
-        """Update center vectors using gradient descent."""
-        pass
+        assert len(ys) == len(zs) == len(ts) == Q
 
-    def _update_variance(self):
-        """Update variance value using gradient descent."""
-        pass
+        new_us = us + eta1/(M + N) * \
+            np.sum([(t - z) * y for t, z, y in zip(ts, zs, ys)], axis=0)
+
+        new_ws = ws + eta2/(M + N) * \
+            np.sum([(t - z) * x for t, z, x in zip(ts, zs, xs)], axis=0)
+
+        new_vs = np.array([None] * M)
+        for m, v in enumerate(vs):
+            new_vs[m] = v + eta3 / variances[m] * \
+                np.sum([(t - z) * us[m] * y[m] * (x - v)
+                        for x, y, z, t in zip(xs, ys, zs, ts)], axis=0)
+
+        new_variances = np.array([None] * M)
+        for m, variance in enumerate(variances):
+            new_variances[m] = variance + eta4/(variance ** 2) * \
+                np.sum([(t - z) * us[m] * y[m] * norm(x - vs[m]) ** 2
+                        for x, y, z, t in zip(xs, ys, zs, ts)], axis=0)
+
+        self.us = new_us
+        self.ws = new_ws
+        self.vs = new_vs
+        self.variances = new_variances
 
     def _init_weights(self):
         """Init linear and non-linear weights.
