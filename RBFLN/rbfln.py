@@ -232,7 +232,7 @@ class RBFLN(object):
             self.eta_non_linear_weights = 2
 
         if self.eta_variance is None:
-            self.eta_variance = 0.1
+            self.eta_variance = 0.01
 
         if self.eta_center_vectors is None:
-            self.eta_center_vectors = 0.1
+            self.eta_center_vectors = 0.01
