@@ -51,6 +51,7 @@ class RBFLN(object):
         self.eta_linear_weights = eta_linear_weights
         self.eta_non_linear_weights = eta_non_linear_weights
         self.variance = variance
+        x2q = {tuple(x): q for q, x in enumerate(list(xs))}
 
         msg = 'The xs and ts parameters should have the same length'
         assert len(xs) == len(ts), msg
@@ -65,7 +66,13 @@ class RBFLN(object):
         for i in range(niter):
             # Calculate ys and zs
             ys = np.apply_along_axis(self._ys, 1, xs)
-            zs = np.apply_along_axis(self._z, 1, xs)
+
+            def mapper(x):
+                x = tuple(x)
+                q = x2q[x]
+                y = ys[q]
+                return self._z(x, y)
+            zs = np.apply_along_axis(mapper, 1, xs)
 
             # Update weights
             self.us = self._update_non_linear_weights(ys, zs)
@@ -118,11 +125,13 @@ class RBFLN(object):
         return np.array([exp(-sn / (2 * var))
                          for var, sn in zip(variances, squared_norms)])
 
-    def _z(self, x):
+    def _z(self, x, ys=None):
         """Calculate the output of the RBFLN model.
 
         :param x: input feature vector.
+        :param ys: precalculated output of the hidden layer.
         :type x: vector of float
+        :type ys: vector of float
 
         :return: output of the model.
         :rtype: float
@@ -132,7 +141,8 @@ class RBFLN(object):
         us = self.us
         ws = self.ws
 
-        ys = self._ys(x)  # TODO optimize using default argument ys=None
+        if ys is None:
+            ys = self._ys(x)
 
         linear_component = np.dot(x, ws)
         nonlinear_component = np.dot(ys, us)
