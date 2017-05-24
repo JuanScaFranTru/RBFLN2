@@ -202,7 +202,7 @@ class RBFLN(object):
         M = self.M
 
         if variance is None:
-            variance = 0.5 * (1/M) ** (1/N)
+            variance = (1/(2*M)) ** (1/N)
 
         self.variances = np.array([variance] * M)
 
