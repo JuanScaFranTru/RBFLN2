@@ -70,7 +70,18 @@ class RBFLN(object):
         self._init_learning_rates()
 
         # Train the model using the training data
-        pass  # TODO
+        old_validation_error = float('inf')
+        for i in range(niter):
+            self._update_variables()
+            error = self.total_sq_error(xs, ts)
+            validation_error = self.total_sq_error(xs_validation,
+                                                   ts_validation)
+            print("  {:2.4f}   {:2.4f} ".format(error, validation_error),
+                  end='\r')
+            if validation_error > old_validation_error:
+                break
+            old_validation_error = validation_error
+        print()
 
     def _sum_sq_error(self, x, t):
         """Partial sum squared errors of the given training input feature
