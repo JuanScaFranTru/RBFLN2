@@ -8,8 +8,6 @@ class RBFLN(object):
     def __init__(self, xs, ts, xs_val, ts_val, M, N, niter=100,
                  eta_linear_weights=None,
                  eta_non_linear_weights=None,
-                 eta_variance=None,
-                 eta_center_vectors=None,
                  variance=None):
         """Create a Radial Basis Functional Link Network.
 
@@ -29,8 +27,6 @@ class RBFLN(object):
         :param niter: Number of iterations.
         :param eta_linear_weights: Learning rate of linear weights.
         :param eta_non_linear_weights: Learning rate of non linear weights.
-        :param eta_variance: Learning rate of variance.
-        :param eta_center_vectors: Learning rate of center vectors.
         :param variance: The initial variance of the RBF.
 
         :type xs: list of vector of float
@@ -42,8 +38,6 @@ class RBFLN(object):
         :type niter: int
         :type eta_linear_weights: float
         :type eta_non_linear_weights: float
-        :type eta_variance: float
-        :type eta_center_vectors: float
         :type variance: float
 
         """
@@ -56,8 +50,6 @@ class RBFLN(object):
         self.niter = niter
         self.eta_linear_weights = eta_linear_weights
         self.eta_non_linear_weights = eta_non_linear_weights
-        self.eta_variance = eta_variance
-        self.eta_center_vectors = eta_center_vectors
         self.variance = variance
 
         msg = 'The xs and ts parameters should have the same length'
@@ -78,8 +70,6 @@ class RBFLN(object):
             # Update weights
             self.us = self._update_non_linear_weights(ys, zs)
             self.ws = self._update_linear_weights(ys, zs)
-            self.vs = self._update_center_vectors(ys, zs)
-            self.variances = self._update_variances(ys, zs)
 
             error = self.total_sq_error(xs, ts)
             validation_error = self.total_sq_error(xs_val, ts_val)
@@ -193,42 +183,6 @@ class RBFLN(object):
 
         return new_ws
 
-    def _update_variances(self, ys, zs):
-        """Update variances via gradient descent."""
-        variances = self.variances
-        eta4 = self.eta_variance
-        ts = self.ts
-        vs = self.vs
-        us = self.us
-        xs = self.xs
-        M = self.M
-
-        new_variances = np.array([None] * M)
-        for m, variance in enumerate(variances):
-            new_variances[m] = variance + eta4/(variance ** 2) * \
-                np.sum([(t - z) * us[m] * y[m] * norm(x - vs[m]) ** 2
-                        for x, y, z, t in zip(xs, ys, zs, ts)], axis=0)
-        return new_variances
-
-    def _update_center_vectors(self, ys, zs):
-        """Update center vectors via gradient descent."""
-        variances = self.variances
-        eta3 = self.eta_center_vectors
-        ts = self.ts
-        vs = self.vs
-        us = self.us
-        xs = self.xs
-        vs = self.vs
-        M = self.M
-
-        new_vs = np.array([None] * M)
-        for m, v in enumerate(vs):
-            new_vs[m] = v + eta3 / variances[m] * \
-                np.sum([(t - z) * us[m] * y[m] * (x - v)
-                        for x, y, z, t in zip(xs, ys, zs, ts)], axis=0)
-
-        return new_vs
-
     def _init_weights(self):
         """Init linear and non-linear weights.
 
@@ -275,9 +229,3 @@ class RBFLN(object):
 
         if self.eta_non_linear_weights is None:
             self.eta_non_linear_weights = 2
-
-        if self.eta_variance is None:
-            self.eta_variance = 0.01
-
-        if self.eta_center_vectors is None:
-            self.eta_center_vectors = 0.01
