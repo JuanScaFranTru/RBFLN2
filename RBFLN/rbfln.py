@@ -230,9 +230,12 @@ class RBFLN(object):
         xs = self.xs
         Q = len(xs)
 
-        self.vs = vs = xs[:M]
+        vs = xs[:M]
         if M > Q:
             vs = np.concatenate((vs, np.random.uniform(0, 1, (M - Q, N))))
+
+        self.vs = vs
+        assert len(self.vs) == M
 
     def _init_learning_rates(self):
         """Init learning rates."""
