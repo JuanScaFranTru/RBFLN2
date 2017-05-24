@@ -126,7 +126,7 @@ class RBFLN(object):
         us = self.us
         ws = self.ws
 
-        ys = self._ys(x)
+        ys = self._ys(x)  # TODO optimize using default argument ys=None
 
         linear_component = np.dot(x, ws)
         nonlinear_component = np.dot(ys, us)
@@ -145,7 +145,7 @@ class RBFLN(object):
         return self._z(x)
 
     def _update_variables(self):
-        """Update weights, center vectors and variances"""
+        """Update weights, center vectors and variances via gradient descent"""
         eta1 = self.eta_non_linear_weights
         eta2 = self.eta_linear_weights
         eta3 = self.eta_center_vectors
