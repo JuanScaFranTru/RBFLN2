@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
+from math import exp
 
 
 class RBFLN(object):
@@ -108,7 +109,8 @@ class RBFLN(object):
         vs = self.vs
         variances = self.variances
         squared_norms = np.array([norm(x - v) ** 2 for v in vs])
-        return np.exp(- squared_norms / (2 * variances))
+        return np.array([exp(-sn / (2 * var))
+                         for var, sn in zip(variances, squared_norms)])
 
     def _z(self, x):
         """Calculate the output of the RBFLN model.
