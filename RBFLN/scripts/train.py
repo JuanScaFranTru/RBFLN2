@@ -13,6 +13,7 @@ from docopt import docopt
 from RBFLN.rbfln import RBFLN
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import random
 
 
 def plotit(f, xs):
@@ -23,13 +24,16 @@ def plotit(f, xs):
 if __name__ == '__main__':
     opts = docopt(__doc__)
 
+    random.seed(1)
     # Load the data
     Q = 110
     xs = np.array([np.array([float(x)]) for x in range(Q)])
-    ts = np.array([float(x**2) for x in range(Q)])
+    ts = np.array([float((x - Q/2) ** 2) for x in range(Q)])
 
     xs = (xs - np.amin(xs)) / (np.amax(xs) - np.amin(xs))
     ts = (ts - np.amin(ts)) / (np.amax(ts) - np.amin(ts))
+    ts += random.normal(0, 0.1, ts.shape)
+
     N = 1
 
     # Read the number of neurons in the hidden layer
