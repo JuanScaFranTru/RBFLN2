@@ -5,7 +5,7 @@ from math import exp
 
 class RBFLN(object):
 
-    def __init__(self, xs, ts, xs_validation, ts_validation, M, N, niter=100,
+    def __init__(self, xs, ts, xs_val, ts_val, M, N, niter=100,
                  eta_linear_weights=None,
                  eta_non_linear_weights=None,
                  eta_variance=None,
@@ -21,8 +21,8 @@ class RBFLN(object):
 
         :param xs: input feature vectors used for training.
         :param ts: associated output target vectors used for training.
-        :param xs_validation: input feature vectors used for validation.
-        :param ts_validation: associated output target vectors used for
+        :param xs_val: input feature vectors used for validation.
+        :param ts_val: associated output target vectors used for
                               validation.
         :param M: Number of neurons in the hidden layer.
         :param N: Number of neurons in the input layer.
@@ -35,8 +35,8 @@ class RBFLN(object):
 
         :type xs: list of vector of float
         :type ts: list of float
-        :type xs_validation: list of vector of float
-        :type ts_validation: list of float
+        :type xs_val: list of vector of float
+        :type ts_val: list of float
         :type M: int
         :type N: int
         :type niter: int
@@ -49,8 +49,8 @@ class RBFLN(object):
         """
         self.xs = np.array([np.array(x) for x in xs])
         self.ts = np.array(ts)
-        self.xs_validation = np.array([np.array(x) for x in xs_validation])
-        self.ts_validation = np.array(ts_validation)
+        self.xs_val = np.array([np.array(x) for x in xs_val])
+        self.ts_val = np.array(ts_val)
         self.M = M
         self.N = N
         self.niter = niter
@@ -70,17 +70,22 @@ class RBFLN(object):
         self._init_learning_rates()
 
         # Train the model using the training data
-        old_validation_error = float('inf')
         for i in range(niter):
-            self._update_variables()
+            # Calculate ys and zs
+            ys = np.apply_along_axis(self._ys, 1, xs)
+            zs = np.apply_along_axis(self._z, 1, xs)
+
+            # Update weights
+            self.us = self._update_non_linear_weights(ys, zs)
+            self.ws = self._update_linear_weights(ys, zs)
+            self.vs = self._update_center_vectors(ys, zs)
+            self.variances = self._update_variances(ys, zs)
+
             error = self.total_sq_error(xs, ts)
-            validation_error = self.total_sq_error(xs_validation,
-                                                   ts_validation)
-            print("  {:2.4f}   {:2.4f} ".format(error, validation_error),
+            validation_error = self.total_sq_error(xs_val, ts_val)
+            print("    {:2.4f}   {:2.4f} ".format(error, validation_error),
                   end='\r')
-            if validation_error > old_validation_error:
-                break
-            old_validation_error = validation_error
+
         print()
 
     def _sum_sq_error(self, x, t):
@@ -155,20 +160,12 @@ class RBFLN(object):
         """
         return self._z(x)
 
-    def _update_variables(self):
-        """Update weights, center vectors and variances via gradient descent"""
+    def _update_non_linear_weights(self, ys, zs):
+        """Update weights via gradient descent."""
         eta1 = self.eta_non_linear_weights
-        eta2 = self.eta_linear_weights
-        eta3 = self.eta_center_vectors
-        eta4 = self.eta_variance
-        vs = self.vs
         us = self.us
-        ws = self.ws
         ts = self.ts
         xs = self.xs
-        ys = np.apply_along_axis(self._ys, 1, xs)
-        zs = np.apply_along_axis(self._z, 1, xs)
-        variances = self.variances
         M = self.M
         N = self.N
         Q = len(xs)
@@ -178,8 +175,51 @@ class RBFLN(object):
         new_us = us + eta1/(M + N) * \
             np.sum([(t - z) * y for t, z, y in zip(ts, zs, ys)], axis=0)
 
+        return new_us
+
+    def _update_linear_weights(self, ys, zs):
+        eta2 = self.eta_linear_weights
+        ws = self.ws
+        ts = self.ts
+        xs = self.xs
+        M = self.M
+        N = self.N
+        Q = len(xs)
+
+        assert len(ys) == len(zs) == len(ts) == Q
+
         new_ws = ws + eta2/(M + N) * \
             np.sum([(t - z) * x for t, z, x in zip(ts, zs, xs)], axis=0)
+
+        return new_ws
+
+    def _update_variances(self, ys, zs):
+        """Update variances via gradient descent."""
+        variances = self.variances
+        eta4 = self.eta_variance
+        ts = self.ts
+        vs = self.vs
+        us = self.us
+        xs = self.xs
+        M = self.M
+
+        new_variances = np.array([None] * M)
+        for m, variance in enumerate(variances):
+            new_variances[m] = variance + eta4/(variance ** 2) * \
+                np.sum([(t - z) * us[m] * y[m] * norm(x - vs[m]) ** 2
+                        for x, y, z, t in zip(xs, ys, zs, ts)], axis=0)
+        return new_variances
+
+    def _update_center_vectors(self, ys, zs):
+        """Update center vectors via gradient descent."""
+        variances = self.variances
+        eta3 = self.eta_center_vectors
+        ts = self.ts
+        vs = self.vs
+        us = self.us
+        xs = self.xs
+        vs = self.vs
+        M = self.M
 
         new_vs = np.array([None] * M)
         for m, v in enumerate(vs):
@@ -187,16 +227,7 @@ class RBFLN(object):
                 np.sum([(t - z) * us[m] * y[m] * (x - v)
                         for x, y, z, t in zip(xs, ys, zs, ts)], axis=0)
 
-        new_variances = np.array([None] * M)
-        for m, variance in enumerate(variances):
-            new_variances[m] = variance + eta4/(variance ** 2) * \
-                np.sum([(t - z) * us[m] * y[m] * norm(x - vs[m]) ** 2
-                        for x, y, z, t in zip(xs, ys, zs, ts)], axis=0)
-
-        self.us = new_us
-        self.ws = new_ws
-        self.vs = new_vs
-        self.variances = new_variances
+        return new_vs
 
     def _init_weights(self):
         """Init linear and non-linear weights.
