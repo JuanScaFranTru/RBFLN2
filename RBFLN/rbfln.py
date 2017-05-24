@@ -4,7 +4,7 @@ from numpy.linalg import norm
 
 class RBFLN(object):
 
-    def __init__(self, xs, ts, M, N, niter=100,
+    def __init__(self, xs, ts, xs_validation, ts_validation, M, N, niter=100,
                  eta_linear_weights=None,
                  eta_non_linear_weights=None,
                  eta_variance=None,
@@ -20,6 +20,9 @@ class RBFLN(object):
 
         :param xs: input feature vectors used for training.
         :param ts: associated output target vectors used for training.
+        :param xs_validation: input feature vectors used for validation.
+        :param ts_validation: associated output target vectors used for
+                              validation.
         :param M: Number of neurons in the hidden layer.
         :param N: Number of neurons in the input layer.
         :param niter: Number of iterations.
@@ -31,6 +34,8 @@ class RBFLN(object):
 
         :type xs: list of vector of float
         :type ts: list of float
+        :type xs_validation: list of vector of float
+        :type ts_validation: list of float
         :type M: int
         :type N: int
         :type niter: int
@@ -39,9 +44,12 @@ class RBFLN(object):
         :type eta_variance: float
         :type eta_center_vectors: float
         :type variance: float
+
         """
         self.xs = np.array([np.array(x) for x in xs])
         self.ts = np.array(ts)
+        self.xs_validation = np.array([np.array(x) for x in xs_validation])
+        self.ts_validation = np.array(ts_validation)
         self.M = M
         self.N = N
         self.niter = niter
